@@ -6,14 +6,19 @@
  */
 class RoboFile extends \Robo\Tasks
 {
-    public function search () {
+    public function search ($w ) {
 
 
 
 
-        $lines = file("server.conf");
+        $lines = file($w);
         $config = array();
-        echo " ** location ** \n";
+        $this->say("searching for location in this file: $w");
+        $this->taskWriteToFile('locations.url')
+            ->append()
+            ->line(date('H:i:s /Y-m-d').' locations for '.$w)
+            ->line('----')
+            ->run();
         foreach ($lines as $l) {
 
 
@@ -25,11 +30,17 @@ class RoboFile extends \Robo\Tasks
 
 
                 $l = ltrim($l);
-                $l=substr($l,strlen("locations"));
+                $l=substr($l,strlen("location"));
                 $l=substr("$l", 0, -2);
                 $l.="\n";
                 $l = ltrim($l);
                 echo "$l";
+
+                $this->taskWriteToFile('locations.url')
+                    ->append()
+                    ->line(' '.$l)
+                    ->line('----')
+                    ->run();
 
             }
 
@@ -77,5 +88,7 @@ class RoboFile extends \Robo\Tasks
             ['2.', 'Run php robo.phar init'],
             ['3.', 'Code your task as a function in Robofile.php']
         ]);
+
+       // $this->search($w);
     }
 }
