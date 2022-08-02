@@ -6,6 +6,40 @@
  */
 class RoboFile extends \Robo\Tasks
 {
+
+
+    public function directory($dir_src) {
+        $this->taskFlattenDir([$dir_src.'/*.conf' =>'dir_dest'])
+            ->run();
+        $dir_dest = 'dir_dest';
+        $files = array();
+        if(is_dir($dir_dest)) {
+            $handle = opendir($dir_dest);
+            while(false !== ($file = readdir($handle))){
+                if(is_file($dir_dest.'/'.$file) && is_readable($dir_dest.'/'.$file)){
+                    $fileNames[] = $file;
+                }
+            }
+            closedir($handle);
+          //  $fileNames = array_reverse($fileNames);
+            print_r($fileNames);
+        }else {
+            echo "<p>There is an directory read issue</p>";
+
+        }
+
+       foreach ($fileNames as $name) {
+           $this->search($name);
+       }
+
+
+
+
+
+
+    }
+
+
     public function search ($w ) {
 
 
