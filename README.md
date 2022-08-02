@@ -39,12 +39,26 @@ Now you can use it simply via `robo`.
  Example:
  robo directory conf.d
 ```
-* To search in a specific file you can use :
+* To search for a location in a specific file you can use :
 ```
  robo search $file
  
  Example:
  robo search conf.d/test.conf
-
- 
 ```
+* To search for a serve_name in a specific file you can use :
+```
+ robo base_url $file
+ 
+ Example:
+ robo base_url conf.d/test.conf
+```
+* To generate a full url in a specific file you can use :
+```
+ robo full $file
+ 
+ Example:
+ robo full conf.d/test.conf
+```
+
+

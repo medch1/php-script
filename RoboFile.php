@@ -12,7 +12,7 @@ class RoboFile extends \Robo\Tasks
         $this->taskFlattenDir([$dir_src.'/*.conf' =>'dir_dest'])
             ->run();
         $dir_dest = 'dir_dest';
-        $files = array();
+
         if(is_dir($dir_dest)) {
             $handle = opendir($dir_dest);
             while(false !== ($file = readdir($handle))){
@@ -21,15 +21,17 @@ class RoboFile extends \Robo\Tasks
                 }
             }
             closedir($handle);
-          //  $fileNames = array_reverse($fileNames);
-            print_r($fileNames);
+          //  print_r($fileNames);
         }else {
             echo "<p>There is an directory read issue</p>";
 
         }
 
        foreach ($fileNames as $name) {
-           $this->search($name);
+
+           $this->search($dir_dest.'/'.$name);
+           $this->base_url($dir_dest.'/'.$name);
+           $this->full($dir_dest.'/'.$name);
        }
 
 
@@ -39,6 +41,87 @@ class RoboFile extends \Robo\Tasks
 
     }
 
+    public function full($w)
+    {
+        $lines = file($w);
+        $this->say("searching for full_url in file :$w");
+        $this->taskWriteToFile('full_url.url')
+            ->append()
+            ->line('----'.date('H:i:s /Y-m-d') . ' full_url for ' . $w)
+            ->run();
+        $pattern = '/server_name ?\s[a-zA-z-.]*/';
+        $location_pattern = "#location *\s[/][\a-zA-Z0-9-/]*#";
+        $full_url=array();
+        $i=0;
+        $base_url = '';
+        $location = '';
+        foreach ($lines as $l) {
+
+
+
+            if (preg_match($pattern, $l, $matches)) {
+
+                $base_url = $l;
+                $base_url = ltrim($base_url);
+                $base_url = substr($base_url, strlen("server_name "));
+                $base_url = substr("$base_url", 0, -2);
+
+
+
+            }
+                if (preg_match($location_pattern, $l, $matches)) {
+                    $i++;
+                    $location = $l;
+                    $location = ltrim($location);
+                    $location = substr($location, strlen("location"));
+                    $location = substr("$location", 0, -2);
+                    $location = ltrim($location);
+
+                    $full_url[$i] = $location;
+                }
+
+
+            }
+        foreach ($full_url as $url){
+            $this->taskWriteToFile('full_url.url')
+                ->append()
+                ->line("$base_url$url")
+                ->run();
+        }
+
+        //print_r($full_url);
+    }
+
+
+    public function base_url($w) {
+        $lines = file($w);
+        $this->say("searching for base url in file :$w");
+        $this->taskWriteToFile('base_urls.url')
+            ->append()
+            ->line(date('H:i:s /Y-m-d').' base url for '.$w)
+            ->line('----')
+            ->run();
+        foreach ($lines as $l) {
+            $pattern ='/server_name ?\s[a-zA-z-.]*/' ;
+            if (preg_match($pattern, $l,$matches)) {
+                echo "$l ";
+
+                $base_url=$l;
+                $base_url = ltrim($base_url);
+               $base_url=substr($base_url,strlen("server_name "));
+                $base_url=substr("$base_url", 0, -2);
+
+                echo "$base_url";
+                $this->taskWriteToFile('base_urls.url')
+                    ->append()
+                    ->line($base_url)
+                    ->line('----')
+                    ->run();
+
+            }
+        }
+    }
+
 
     public function search ($w ) {
 
@@ -46,7 +129,6 @@ class RoboFile extends \Robo\Tasks
 
 
         $lines = file($w);
-        $config = array();
         $this->say("searching for location in this file: $w");
         $this->taskWriteToFile('locations.url')
             ->append()
@@ -56,27 +138,28 @@ class RoboFile extends \Robo\Tasks
         foreach ($lines as $l) {
 
 
-            $pattern ="#location *~*\s[/][\a-zA-Z0-9-/]*#" ;
+            $location_pattern ="#location *\s[/][\a-zA-Z0-9-/]*#" ;
 
 
-            if(preg_match($pattern, $l, $matches))
+            if(preg_match($location_pattern, $l, $matches))
             {
 
-
-                $l = ltrim($l);
-                $l=substr($l,strlen("location"));
-                $l=substr("$l", 0, -2);
-                $l.="\n";
-                $l = ltrim($l);
-                echo "$l";
+                $location = $l;
+                $location = ltrim($location);
+                $location=substr($location,strlen("location"));
+                $location=substr("$location", 0, -2);
+                $location.="\n";
+                $location = ltrim($location);
+                echo "$location";
 
                 $this->taskWriteToFile('locations.url')
                     ->append()
-                    ->line(' '.$l)
+                    ->line(' '.$location)
                     ->line('----')
                     ->run();
 
             }
+
 
             //preg_match_all("/^(?P<key>\w+)\s+(?P<value>.*)/", $l, $matches);
 
@@ -100,12 +183,13 @@ class RoboFile extends \Robo\Tasks
             /*if (isset($matches['key'])) {
                 $config[$matches['key']] = $matches['value'];
             }*/
-        }
+
 
 
         //var_dump($config);
 
 
+    }
     }
 
 
