@@ -45,6 +45,6 @@ Now you can use it simply via `robo`.
  
  Example:
  robo search conf.d/test.conf
- robo search conf.d/test.conf
+
  
 ```
