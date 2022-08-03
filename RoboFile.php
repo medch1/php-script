@@ -7,6 +7,30 @@
 class RoboFile extends \Robo\Tasks
 {
 
+    public function curl($url)
+    {
+        $url = 'https://' . $url;
+        //$url="stage-connector.bumbal.eu/  ";
+
+        //$this->taskExec('curl')->arg($url)->run();
+
+        $this->_exec("curl -I -m 10 $url");
+
+        /*$ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://www.keycdn.com');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+        curl_close($ch);
+        echo $result;*/
+        echo "\n **";
+
+    }
+
+
 
     public function directory($dir_src) {
         $this->taskFlattenDir([$dir_src.'/*.conf' =>'dir_dest'])
@@ -23,7 +47,7 @@ class RoboFile extends \Robo\Tasks
             closedir($handle);
           //  print_r($fileNames);
         }else {
-            echo "<p>There is an directory read issue</p>";
+            echo "<p>There is a directory read issue</p>";
 
         }
 
@@ -32,11 +56,9 @@ class RoboFile extends \Robo\Tasks
            $this->search($dir_dest.'/'.$name);
            $this->base_url($dir_dest.'/'.$name);
            $this->full($dir_dest.'/'.$name);
+
+
        }
-
-
-
-
 
 
     }
@@ -82,11 +104,16 @@ class RoboFile extends \Robo\Tasks
 
 
             }
+
+
+
         foreach ($full_url as $url){
             $this->taskWriteToFile('full_url.url')
                 ->append()
                 ->line("$base_url$url")
                 ->run();
+            $this->curl("$base_url$url");
+
         }
 
         //print_r($full_url);

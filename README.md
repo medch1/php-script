@@ -60,5 +60,13 @@ Now you can use it simply via `robo`.
  Example:
  robo full conf.d/test.conf
 ```
+* To send a curl to specific url you can use :
+```
+ robo curl url
+ 
+ Example:
+ robo curl https://www.google.com
+```
+
 
 
